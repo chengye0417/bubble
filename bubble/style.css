@@ -1,0 +1,32 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+canvas {
+  display: block;
+}
+
+
+    
+    #patch {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+    }
+
+    #connection {
+      color: #0d7e7e;
+      float: right;
+      position: absolute;
+      top: 0em;
+      right: 0em;
+      font-weight: bold;
+    }
+
+    #app {
+      margin-top: 3em;
+    }
+
+    [nexus-ui] {
+      margin: 1em auto;
+    }

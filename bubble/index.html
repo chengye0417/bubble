@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <meta content="yes" name="mobile-web-app-capable">
+  <meta content="black" name="apple-mobile-web-app-status-bar-style">
+  <script src="https://cdn.jsdelivr.net/npm/nexusui@2.0.5/dist/NexusUI.min.js" type="application/javascript"></script>
+
+
+
+
+
+
+
+ <!-- PLEASE NO CHANGES BELOW THIS LINE (UNTIL I SAY SO) -->
+  <script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
+  <script language="javascript" type="text/javascript" src="libraries/p5.dom.js"></script>
+  <script language="javascript" type="text/javascript" src="libraries/osc-node-serialport-loader.js"></script>
+  <script language="javascript" type="text/javascript" src="libraries/osc.js"></script>
+  <script language="javascript" type="text/javascript" src="libraries/osc-websocket-client.js"></script>
+  <script language="javascript" type="text/javascript" src="libraries/osc-node.js"></script>
+  <script language="javascript" type="text/javascript" src="libraries/p5.serialport.js"></script>
+  <script language="javascript" type="text/javascript" src="libraries/osc-node-serialport.js"></script>
+  <script language="javascript" type="text/javascript" src="libraries/osc-transports.js"></script>
+  <script language="javascript" type="text/javascript" src="libraries/osc-chromeapp.js"></script>
+  <script language="javascript" type="text/javascript" src="bubble.js"></script>
+  <!-- OK, YOU CAN MAKE CHANGES BELOW THIS LINE AGAIN -->
+  <script language="javascript" type="text/javascript" src="libraries/p5.serialport.js"></script>
+  <script src="https://unpkg.com/handsfree@8.4.3/build/lib/handsfree.js"></script>
+
+
+
+  <title>bubble boo</title>
+  
+<body>
+  <p id="patch"><a href="https://github.com/chr15m/pd-ws/blob/master/demo/boing.pd">demo/boing.pd</a></p>
+  <p id="connection">not connected</p>
+  <div id="app">
+    <div id="ticker"></div>
+    <div id="sequencer"></div>
+    <div id="cutoff"></div>
+  </div>
+  <script type="text/javascript">
+    var ticker = new Nexus.RadioButton("#ticker", {"numberOfButtons": 16, "size": [320, 20]});
+    var sequencer = new Nexus.Sequencer("#sequencer", {"size": [320, 20], "rows": 1, "columns": 16, "mode": "toggle"})
+    var cutoff = new Nexus.Dial('#cutoff', {"interaction": "vertical", "max": 127, "min": 0, "size": [75, 75]});
+    
+    $ = document.getElementById.bind(document);
+    
+    var ws = new WebSocket("ws://localhost:9001/");
+    
+    cutoff.on("change", function(v) {
+      ws.send(["cutoff", v]);
+    });
+
+    sequencer.on("change", function(v) {
+      console.log(sequencer.matrix.pattern[0]);
+      var table = sequencer.matrix.pattern[0].map(Number);
+      ws.send(["lookup", 0].concat(table));
+    });
+    
+    /* when a message is received from Pd */
+    ws.onmessage = function(message) {
+      // console.log("message", message, message.data);
+      //$("receiver").innerHTML += message.data + "\n";
+      //$("receiver").setAttribute("rows", $("receiver").innerHTML.split("\n").length - 1);
+      var message = message.data.split(" ");
+      console.log("message", message);
+      if (message[0] == "tick") {
+        ticker.select(parseInt(message[1]));
+      }
+    };
+    
+    ws.onopen = function() {
+      $("connection").innerHTML = "connected";
+    };
+    
+    ws.onclose = function() {
+      $("connection").innerHTML = "not connected";
+    };
+  </script>
+</body>
+
+ <meta charset="utf-8">
+</html>
